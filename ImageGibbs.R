@@ -1,11 +1,11 @@
 library(jpeg)
-img = readJPEG("./seg.jpg")
-img_seg = img
+P = readJPEG("./seg.jpg")
+P_seg = P
 
 K = 5 #number of clusters
-R=img[,,1]
-G=img[,,2]
-B=img[,,3]
+R=P[,,1]
+G=P[,,2]
+B=P[,,3]
 m = nrow(R)
 n = ncol(R)
 
@@ -17,12 +17,12 @@ data = cbind(R,G,B)
 
 Kmeans = kmeans(data,K) #kmeans 5 clusters
 C = Kmeans$cluster
-dim(C) = c(m,n) #!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dim(C) = c(m,n) 
 
 for(i in 1:m){
   for(j in 1:n){
     k = C[i,j]
-    img_seg[i,j,] = Kmeans$centers[k,]
+    P_seg[i,j,] = Kmeans$centers[k,]
   }
 }
 
@@ -33,4 +33,4 @@ for(k in 1:K){
 }
 
 
-writeJPEG(img_seg,"./my1.jpg",0.95)
+writeJPEG(P_seg,"./my1.jpg",0.95)
