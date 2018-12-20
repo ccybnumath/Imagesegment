@@ -39,8 +39,9 @@ bool kMeans(mat &C, cube &P, unsigned int K,int n_iter){
 }
 
 
+
 // [[Rcpp::export]]
-mat ImageGibbs(int K, cube P, mat C, double alpha, double beta, 
+mat ImageGibbs(int K, cube P, mat C, mat MuK, cube SigmaK, double alpha, double beta, 
                  vec mu0, mat lambda0, vec v0, mat sigma0, int burnIn,int mcmcN){
   /*
    * * INPUT:
@@ -55,12 +56,31 @@ mat ImageGibbs(int K, cube P, mat C, double alpha, double beta,
    * * OUTPUT
    * sample
    */
-  int i;
+  //Init
+  unsigned int i,j,k;
   int m=P.n_rows,n=P.n_cols;
   cube sampleC(m,n,mcmcN);
-  mat sampleSigma(K,mcmcN);
-  mat sampleMu(K,mcmcN);
+  cube Sigma(3,3,K);
+  mat Mu(3,K);
+  Sigma=SigmaK;
+  Mu=MuK;
   
+  mat mu1(3,1);
+  mat sigma1(3,3);
+  //Update
+  for(i=0;i<burnIn+ mcmcN;i++){
+    
+    // update Mu
+    for(k=0;k<K;k++){
+      
+    }
+    
+    
+    
+    
+    
+    
+  }
   
   return sampleC;
   
