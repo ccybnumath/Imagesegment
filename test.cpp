@@ -36,8 +36,8 @@ mat computeSk(cube &P, mat &C, mat &Mu, int k){
         Sk+=temp*temp.t();
       }
     }
-  
-  return Sk;
+    
+    return Sk;
 }
 
 vec sumP(cube &P, mat &C, int k){
@@ -55,20 +55,20 @@ vec sumP(cube &P, mat &C, int k){
 
 // [[Rcpp::export]]
 cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta, 
-                 vec mu0, mat lambda0, int v0, mat sigma0, unsigned int burnIn,unsigned int mcmcN){
+                vec mu0, mat lambda0, int v0, mat sigma0, unsigned int burnIn,unsigned int mcmcN){
   /*
-   * * INPUT:
-   * K represents K groups
-   * P is the RGB image Cube
-   * m,n are the rows & cols of the Image P
-   * C represents the membership of the Image,cij belongs to {1,2,...,K}
-   * alpha, beta are the parameters of Potts Models
-   * mu0 is the mean of the prior Normal distribution 
-   * lambda0 is the variance Matrix
-   * v0, sigma0 is the parameters of the Inverse-Wishart
-   * * OUTPUT
-   * sample
-   */
+  * * INPUT:
+  * K represents K groups
+  * P is the RGB image Cube
+  * m,n are the rows & cols of the Image P
+  * C represents the membership of the Image,cij belongs to {1,2,...,K}
+  * alpha, beta are the parameters of Potts Models
+  * mu0 is the mean of the prior Normal distribution 
+  * lambda0 is the variance Matrix
+  * v0, sigma0 is the parameters of the Inverse-Wishart
+  * * OUTPUT
+  * sample
+  */
   //Init
   unsigned int i,j,k,l;
   unsigned int m=P.n_rows,n=P.n_cols;
@@ -93,31 +93,8 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
       Mu.col(k)=rmvnorm(1,tempMu,tempSigma).t();
     }
     
-    //update Sigma
-    for(k=0;k<K;k++){
-      tempnk=sum(sum(C==k));
-      tempv0=v0+tempnk;
-      tempSk=computeSk(P,C,Mu,k);
-      tempSk=inv(sigma0)+tempSk;
-      Sigma.slice(k)=riwish(tempv0,tempSk);
-    }
-    
-    //update Cij
-    vec probK(K,fill::zeros);
-    vec fullvec = regspace<vec>(1,K);
-    for(i=0;i<m;i++)
-      for(j=0;j<n;j++){
-        for(k=0;k<K;k++){
-          probK.at(k)=sum(dmvnorm(P.tube(i,j),Mu.col(k),Sigma.slice(k)))*Pr(C,alpha,beta,i,j,k);
-        }
-        probK/=sum(probK);
-        C.at(i,j)=sum(Rcpp::RcppArmadillo::sample(fullvec,1,true,probK));
-      }
-    //record
-    if(l>=burnIn) sampleC.slice(l-burnIn)=C;
   }
   
   return sampleC;
-  // to do find Mod of sample C;
   
 }
