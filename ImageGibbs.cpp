@@ -19,10 +19,10 @@ double Pr(mat &C, double alpha, double beta, int i, int j, int k){
   vector<int> a{-1,1};
   int m=0;
   double sum=0;
-  for(m=0;m<1;m++)
+  for(m=0;m<1;m++){
     sum+=(C.at(mirrorIndex(i+a.at(m),C.n_rows),j)==k?alpha:beta);
-  for(m=0;m<1;m++)
     sum+=(C.at(i, mirrorIndex(j+a.at(m),C.n_cols))==k?alpha:beta);
+  }
   return exp(sum);
 }
 
