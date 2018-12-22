@@ -21,6 +21,8 @@ double Pr(mat &C, double alpha, double beta, int i, int j, int k){
   double sum=0;
   for(m=0;m<1;m++)
     sum+=(C.at(mirrorIndex(i+a.at(m),C.n_rows),j)==k?alpha:beta);
+  for(m=0;m<1;m++)
+    sum+=(C.at(i, mirrorIndex(j+a.at(m),C.n_cols))==k?alpha:beta);
   return exp(sum);
 }
 
@@ -104,7 +106,7 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
     
     //update Cij
     vec probK(K,fill::zeros);
-    vec fullvec = regspace<vec>(1,K);
+    vec fullvec = regspace<vec>(0,K-1);
     for(i=0;i<m;i++)
       for(j=0;j<n;j++){
         for(k=0;k<K;k++){
