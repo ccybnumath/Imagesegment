@@ -38,8 +38,8 @@ for(k in 1:K){
 }
 
 # Initial values
-alpha=2
-beta=5
+alpha=1
+beta=0.5
 v0=7 # df of prior Inverse-Wishart
 sigma0=diag(rep(1,3))
 mu0=c(1,1,1)

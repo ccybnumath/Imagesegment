@@ -4,27 +4,12 @@
 #include <mvnorm.h>
 #include <omp.h>
 
+#include <UpdateC.cpp>
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 
-int mirrorIndex(int fetchI, int length){
-  return (fetchI<0)+(fetchI>=length)*(length-2);
-}
-
-
-//Potts Model
-double Pr(mat &C, double alpha, double beta, int i, int j, int k){
-  vector<int> a{-1,1};
-  int m=0;
-  double sum=0;
-  for(m=0;m<1;m++){
-    sum+=(C.at(mirrorIndex(i+a.at(m),C.n_rows),j)==k?alpha:beta);
-    sum+=(C.at(i, mirrorIndex(j+a.at(m),C.n_cols))==k?alpha:beta);
-  }
-  return exp(sum);
-}
 
 
 mat computeSk(cube &P, mat &C, mat &Mu, int k){
@@ -56,8 +41,8 @@ vec sumP(cube &P, mat &C, int k){
 }
 
 // [[Rcpp::export]]
-cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta, 
-                 vec mu0, mat lambda0, int v0, mat sigma0, unsigned int burnIn,unsigned int mcmcN){
+cube ImageGibbs(uword K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta, 
+                 vec mu0, mat lambda0, int v0, mat sigma0, uword burnIn,uword mcmcN){
   /*
    * * INPUT:
    * K represents K groups
@@ -72,8 +57,8 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
    * sample
    */
   //Init
-  unsigned int i,j,k,l;
-  unsigned int m=P.n_rows,n=P.n_cols;
+  uword k,l;
+  uword m=P.n_rows,n=P.n_cols;
   cube sampleC(m,n,mcmcN);
   C=C-1;
   
@@ -105,16 +90,8 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
     }
     
     //update Cij
-    vec probK(K,fill::zeros);
-    vec fullvec = regspace<vec>(0,K-1);
-    for(i=0;i<m;i++)
-      for(j=0;j<n;j++){
-        for(k=0;k<K;k++){
-          probK.at(k)=sum(dmvnorm(P.tube(i,j),Mu.col(k),Sigma.slice(k)))*Pr(C,alpha,beta,i,j,k);
-        }
-        probK/=sum(probK);
-        C.at(i,j)=sum(Rcpp::RcppArmadillo::sample(fullvec,1,true,probK));
-      }
+    UpdateC(C,P,Mu,Sigma,m,n,K,alpha,beta);
+      
     //record
     if(l>=burnIn) sampleC.slice(l-burnIn)=C;
   }
