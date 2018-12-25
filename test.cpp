@@ -4,25 +4,12 @@
 #include <mvnorm.h>
 #include <omp.h>
 
+#include <UpdateC.cpp>
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 
-int mirrorIndex(int fetchI, int length){
-  return (fetchI<0)+(fetchI>=length)*(length-2);
-}
-
-
-//Potts Model
-double Pr(mat &C, double alpha, double beta, int i, int j, int k){
-  vector<int> a{-1,1};
-  int m=0;
-  double sum=0;
-  for(m=0;m<1;m++)
-    sum+=(C.at(mirrorIndex(i+a.at(m),C.n_rows),j)==k?alpha:beta);
-  return exp(sum);
-}
 
 
 mat computeSk(cube &P, mat &C, mat &Mu, int k){
@@ -54,8 +41,8 @@ vec sumP(cube &P, mat &C, int k){
 }
 
 // [[Rcpp::export]]
-cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta, 
-                vec mu0, mat lambda0, int v0, mat sigma0, unsigned int burnIn,unsigned int mcmcN){
+cube ImageGibbs(uword K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta, 
+                vec mu0, mat lambda0, int v0, mat sigma0, uword burnIn,uword mcmcN){
   /*
   * * INPUT:
   * K represents K groups
@@ -70,8 +57,8 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
   * sample
   */
   //Init
-  unsigned int i,j,k,l;
-  unsigned int m=P.n_rows,n=P.n_cols;
+  uword k,l;
+  uword m=P.n_rows,n=P.n_cols;
   cube sampleC(m,n,mcmcN);
   C=C-1;
   
@@ -93,8 +80,23 @@ cube ImageGibbs(unsigned int K, cube P, mat C, mat Mu, cube Sigma, double alpha,
       Mu.col(k)=rmvnorm(1,tempMu,tempSigma).t();
     }
     
+    //update Sigma
+    for(k=0;k<K;k++){
+      tempnk=sum(sum(C==k));
+      tempv0=v0+tempnk;
+      tempSk=computeSk(P,C,Mu,k);
+      tempSk=inv(sigma0)+tempSk;
+      Sigma.slice(k)=riwish(tempv0,tempSk);
+    }
+    
+    //update Cij
+    UpdateC(C,P,Mu,Sigma,m,n,K,alpha,beta);
+    
+    //record
+    if(l>=burnIn) sampleC.slice(l-burnIn)=C;
   }
   
   return sampleC;
+  // to do find Mod of sample C;
   
 }

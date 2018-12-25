@@ -11,6 +11,7 @@ using namespace std;
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 
 //Update Cij
+// to do parallel
 // [[Rcpp::export]]
 int UpdateCij(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, 
               uword n, uword K, double alpha, double beta, 
@@ -33,7 +34,8 @@ int UpdateCij(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
 }
 
 // [[Rcpp::export]]
-void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta){
+void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma,
+             uword m, uword n, uword K, double alpha, double beta){
   uword i,j;
   vec probK(K,fill::zeros);
   vec N(K,fill::zeros);

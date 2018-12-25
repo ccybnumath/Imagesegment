@@ -1,5 +1,6 @@
 library(jpeg)
 P = readJPEG("./seg.jpg")
+P=P[1:150,1:150,]
 P_seg = P
 
 K = 14 #number of clusters
