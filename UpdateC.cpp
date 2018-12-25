@@ -34,19 +34,55 @@ int UpdateCij(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
 }
 
 // [[Rcpp::export]]
+<<<<<<< HEAD
 void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma,
              uword m, uword n, uword K, double alpha, double beta){
   uword i,j;
+=======
+int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, 
+              uword n, uword K, double alpha, double beta, 
+              uword i, uword j){
+  uword k;
+>>>>>>> 36c3211bfe7b97cf628c860b8eec994f0b961255
   vec probK(K,fill::zeros);
   vec N(K,fill::zeros);
   vec fullvec = regspace<vec>(0,K-1);
   mat Cij=C;
+  for(k=0;k<K;k++){
+    Cij.at(i,j)=k;
+    N.at(k)=sum(dmvnorm(P.tube(i,j),Mu.col(k),Sigma.slice(k)));
+    probK.at(k)=Pr_parallel(Cij,alpha,beta);
+  }
+  probK-=max(probK);
+  probK=exp(probK);
+  N/=max(N);
+  probK=probK%N/sum(probK.t()*N);
+  return sum(Rcpp::RcppArmadillo::sample(fullvec,1,true,probK));
+}
+
+// [[Rcpp::export]]
+void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta){
+  uword i,j;
   for(i=0;i<m;i++)
     for(j=0;j<n;j++){
       C.at(i,j)=UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,i,j);
     }
     
 }
+
+// [[Rcpp::export]]
+void UpdateC_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta){
+  uword i,j;
+#pragma omp parallel for schedule(static)            \
+  private(i,j) shared(m,n,C,P,Mu,Sigma,K,alpha,beta) \
+    collapse(2)
+    for(i=0;i<m;i++)
+      for(j=0;j<n;j++){
+        C.at(i,j)=UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,i,j);
+      }
+      
+}
 /*** R
-UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19)
+library(microbenchmark)
+microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19))
 */

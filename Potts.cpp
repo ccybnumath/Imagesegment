@@ -36,3 +36,18 @@ double Pr(mat &C, double alpha, double beta){
   }
   return sum;
 }
+
+// [[Rcpp::export]]
+double Pr_parallel(mat &C, double alpha, double beta){
+  double sum=0;
+  uword i,j;
+#pragma omp parallel for reduction(+:sum) schedule(static) \
+  private(i,j) shared(C,alpha,beta) \
+    collapse(2)
+  for(i=0;i<C.n_rows;i++){
+    for(j=0;j<C.n_cols;j++){
+      sum+=PrCij(C,alpha,beta,i,j,C.at(i,j));
+    }
+  }
+  return sum;
+}
