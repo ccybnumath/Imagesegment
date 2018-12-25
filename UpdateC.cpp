@@ -34,16 +34,10 @@ int UpdateCij(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
 }
 
 // [[Rcpp::export]]
-<<<<<<< HEAD
-void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma,
-             uword m, uword n, uword K, double alpha, double beta){
-  uword i,j;
-=======
 int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, 
               uword n, uword K, double alpha, double beta, 
               uword i, uword j){
   uword k;
->>>>>>> 36c3211bfe7b97cf628c860b8eec994f0b961255
   vec probK(K,fill::zeros);
   vec N(K,fill::zeros);
   vec fullvec = regspace<vec>(0,K-1);
