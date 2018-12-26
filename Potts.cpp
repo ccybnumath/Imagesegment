@@ -11,21 +11,20 @@ using namespace std;
 
 //Potts Model
 //compute cij
-int mirrorIndex(int fetchI, int length)
+inline int mirrorIndex(int fetchI, int length)
 {
   return (fetchI < 0) + (fetchI >= length) * (length - 2);
 }
-
-double PrCij(mat &C, double alpha, double beta, int i, int j, int cij)
+// [[Rcpp::export]]
+double PrCij(mat &C, double alpha, double beta, int i, int j)
 {
-  vector<int> a{-1, 1};
-  unsigned int m = 0;
+  uword m = C.n_rows, n = C.n_cols;
+  int cij = C.at(i, j);
   double sum = 0;
-  for (m = 0; m < 1; m++)
-  {
-    sum += (C.at(mirrorIndex(i + a.at(m), C.n_rows), j) == cij ? alpha : beta);
-    sum += (C.at(i, mirrorIndex(j + a.at(m), C.n_cols)) == cij ? alpha : beta);
-  }
+  sum += (C.at(mirrorIndex(i - 1, m), j) == cij ? alpha : beta);
+  sum += (C.at(mirrorIndex(i + 1, m), j) == cij ? alpha : beta);
+  sum += (C.at(i, mirrorIndex(j + 1, n)) == cij ? alpha : beta);
+  sum += (C.at(i, mirrorIndex(j - 1, n)) == cij ? alpha : beta);
   return sum;
 }
 
@@ -37,7 +36,7 @@ double Pr(mat &C, double alpha, double beta)
   {
     for (unsigned int j = 0; j < C.n_cols; j++)
     {
-      sum += PrCij(C, alpha, beta, i, j, C.at(i, j));
+      sum += PrCij(C, alpha, beta, i, j);
     }
   }
   return sum;
@@ -55,8 +54,12 @@ double Pr_parallel(mat &C, double alpha, double beta)
   {
     for (j = 0; j < C.n_cols; j++)
     {
-      sum += PrCij(C, alpha, beta, i, j, C.at(i, j));
+      sum += PrCij(C, alpha, beta, i, j);
     }
   }
   return sum;
 }
+/*** R
+library(microbenchmark)
+microbenchmark(Pr_parallel(C, alpha, beta),Pr(C, alpha, beta))
+*/
