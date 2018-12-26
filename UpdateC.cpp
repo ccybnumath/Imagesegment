@@ -144,6 +144,21 @@ int UpdateCij_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
 // [[Rcpp::export]]
 void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta, mat Prob)
 {
+  /*
+  * 我的电脑的结果
+  * > microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
+  *Unit: seconds
+  *                                                                   expr      min       lq     mean   median       uq      max neval
+  * UpdateC_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta,      Prob) 451.9796 451.9796 451.9796 451.9796 451.9796 451.9796     1
+  * 
+  * 服务器上面的
+  * > microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
+  *Unit: seconds
+  *                                                                   expr      min       lq     mean   median       uq
+  * UpdateC_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta,      Prob) 25.82491 25.82491 25.82491 25.82491 25.82491
+  *     max neval
+  * 25.82491     1 */
+  */
   uword i, j;
 #pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
     collapse(2)
@@ -152,9 +167,11 @@ void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uwor
     {
       C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
     }
+
 }
 
 /*** R
 library(microbenchmark)
 microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19,Prob))
+microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
 */
