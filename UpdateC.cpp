@@ -82,6 +82,21 @@ void UpdateC_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, u
       C.at(i, j) = UpdateCij(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j);
     }
 }
+
+// [[Rcpp::export]]
+void UpdateC_parallel1(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta)
+{
+  uword i, j;
+  mat Prob(m, n);
+  
+#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta) \
+    collapse(2)
+  for (i = 0; i < m; i++)
+    for (j = 0; j < n; j++)
+    {
+      C.at(i, j) = UpdateCij(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j);
+    }
+}
 /*** R
 library(microbenchmark)
 microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19))
