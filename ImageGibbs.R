@@ -45,6 +45,7 @@ v0 = 7 # df of prior Inverse-Wishart
 sigma0 = diag(rep(1, 3))
 mu0 = c(1, 1, 1)
 lambda0 = diag(rep(1, 3))
+Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
 result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 10, 100)
 
