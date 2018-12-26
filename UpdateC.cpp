@@ -178,7 +178,6 @@ void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uwor
       C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
     }
   }
-
 }
 
 /*** R
