@@ -157,7 +157,7 @@ void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uwor
   *                                                                   expr      min       lq     mean   median       uq
   * UpdateC_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta,      Prob) 25.82491 25.82491 25.82491 25.82491 25.82491
   *     max neval
-  * 25.82491     1 */
+  * 25.82491     1 
   */
   uword i, j;
 #pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
