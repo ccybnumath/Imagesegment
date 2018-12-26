@@ -163,10 +163,21 @@ void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uwor
 #pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
     collapse(2)
   for (i = 0; i < m; i++)
-    for (j = 0; j < n; j++)
+  {
+    for (j = i % 2; j < n; j += 2)
     {
       C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
     }
+  }
+#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
+    collapse(2)
+  for (i = 0; i < m; i++)
+  {
+    for (j = (i + 1) % 2; j < n; j += 2)
+    {
+      C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
+    }
+  }
 
 }
 
