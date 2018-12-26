@@ -1,6 +1,6 @@
 library(jpeg)
 P = readJPEG("./seg.jpg")
-P=P[1:150,1:150,]
+#P=P[1:150,1:150,]
 P_seg = P
 
 K = 14 #number of clusters
@@ -74,3 +74,9 @@ for(i in 1:m){
   }
 }
 writeJPEG(P_seg,"./my1.jpg",0.95)
+
+# test speed
+library(microbenchmark)
+microbenchmark(computeSk_parallel(P,C,Mu,10),computeSk(P,C,Mu,10))
+microbenchmark(sumP(P,C,10),sumP_parallel(P,C,10))
+microbenchmark(UpdateC(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateC_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19))
