@@ -47,7 +47,7 @@ mu0 = c(1, 1, 1)
 lambda0 = diag(rep(1, 3))
 Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
-result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 10, 100)
+result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 1, 1)
 
 Mod <- function(x) {
   as.numeric(names(table(x)))[which.max(table(x))]
@@ -63,6 +63,7 @@ findMod <- function(result) {
   return(C)
 }
 
+library(RColorBrewer)
 C <- findMod(result)
 color <- col2rgb(brewer.pal(12, "Paired"))
 
@@ -75,7 +76,7 @@ for (i in 1:m) {
   }
 }
 writeJPEG(P_seg, "./my1.jpg", 0.95)
-
+writeJPEG(P, "./my2.jpg", 0.95)
 # test speed
 library(microbenchmark)
 microbenchmark(computeSk_parallel(P, C, Mu, 10), computeSk(P, C, Mu, 10))
