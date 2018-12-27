@@ -84,3 +84,6 @@ microbenchmark(
   UpdateC(C, P, Mu, Sigma, m, n, K, alpha, beta, 15, 19),
   UpdateC_parallel(C, P, Mu, Sigma, m, n, K, alpha, beta, 15, 19)
 )
+library(microbenchmark)
+microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19,Prob))
+microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
