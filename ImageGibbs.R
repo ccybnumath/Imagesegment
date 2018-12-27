@@ -64,6 +64,7 @@ findMod <- function(result) {
 }
 
 C <- findMod(result)
+library(RColorBrewer)
 color <- col2rgb(brewer.pal(12, "Paired"))
 
 
