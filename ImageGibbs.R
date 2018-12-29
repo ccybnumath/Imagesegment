@@ -47,7 +47,7 @@ mu0 = c(1, 1, 1)
 lambda0 = diag(rep(1, 3))
 Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
-result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 10, 100)
+result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 100, 2000)
 
 Mod <- function(x) {
   as.numeric(names(table(x)))[which.max(table(x))]
@@ -67,7 +67,7 @@ C <- findMod(result)
 library(RColorBrewer)
 color <- col2rgb(brewer.pal(12, "Paired"))
 
-
+C <- C+1
 for (i in 1:m) {
   for (j in 1:n) {
     k = C[i, j]
@@ -88,3 +88,4 @@ microbenchmark(
 library(microbenchmark)
 microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19,Prob))
 microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
+microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
