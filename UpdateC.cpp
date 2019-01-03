@@ -41,7 +41,7 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
   mat Cij = C;
   mat Probij = Prob;
   
-  trng distSampling
+  //trng distSampling
   trng::yarn2 rx;
   double x;
   rx.seed(10);
@@ -58,7 +58,7 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
     Probij.at(mirrorIndex(i + 1, m), j) = PrCij(Cij, alpha, beta, mirrorIndex(i + 1, m), j);
     Probij.at(i, mirrorIndex(j - 1, n)) = PrCij(Cij, alpha, beta, i, mirrorIndex(j - 1, n));
     Probij.at(i, mirrorIndex(j + 1, n)) = PrCij(Cij, alpha, beta, i, mirrorIndex(j + 1, n));
-
+    
     N.at(k) = sum(dmvnorm(P.tube(i, j), Mu.col(k), Sigma.slice(k)));
     probK.at(k) = accu(Probij);
   }

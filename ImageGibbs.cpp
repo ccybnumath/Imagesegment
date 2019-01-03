@@ -167,3 +167,5 @@ cube ImageGibbs(uword K, cube P, mat &C, mat &Mu, cube &Sigma, double alpha, dou
   return sampleC;
   // to do find Mod of sample C;
 }
+                                                  
+                              

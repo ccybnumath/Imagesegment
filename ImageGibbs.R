@@ -51,6 +51,8 @@ Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 #result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 500, 6000)
 result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 10, 100)
 
+
+
 Mod <- function(x) {
   as.numeric(names(table(x)))[which.max(table(x))]
 }
