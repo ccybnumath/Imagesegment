@@ -7,7 +7,7 @@
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppArmadillo, RcppDist)]]
+// [[Rcpp::depends(RcppArmadillo)]]
 
 //Potts Model
 inline int mirrorIndex(int fetchI, int length)
@@ -28,7 +28,3 @@ double PrCij(mat &C, double alpha, double beta, int i, int j)
   return sum;
 }
 
-/*** R
-library(microbenchmark)
-microbenchmark(Pr_parallel(C, alpha, beta),Pr(C, alpha, beta))
-*/

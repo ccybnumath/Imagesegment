@@ -2,15 +2,15 @@
 #include <RcppArmadilloExtensions/sample.h>
 #include <mvnorm.h>
 #include <omp.h>
-#include <wishart.h>
-#include <trng/yarn2.hpp>
 #include <trng/discrete_dist.hpp>
+#include <trng/yarn2.hpp>
+#include <wishart.h>
 
 #include <Potts.cpp>
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppArmadillo, RcppDist)]]
+// [[Rcpp::depends(RcppArmadillo)]]
 
 // [[Rcpp::export]]
 void InitProb_parallel(mat &Prob, mat &C, double alpha, double beta)
@@ -40,15 +40,15 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
   vec fullvec = regspace<vec>(0, K - 1);
   mat Cij = C;
   mat Probij = Prob;
-  
+
   //trng distSampling
   trng::yarn2 rx;
   double x;
   rx.seed(10);
-  int size = omp_get_num_threads();     // get total number of processes
-  int rank = omp_get_thread_num();      // get rank of current process
-  rx.split(size, rank);               // choose sub-stream no. rank out of size streams
-  
+  int size = omp_get_num_threads(); // get total number of processes
+  int rank = omp_get_thread_num();  // get rank of current process
+  rx.split(size, rank);             // choose sub-stream no. rank out of size streams
+
   for (k = 0; k < K; k++)
   {
     //revise Probij
@@ -58,11 +58,11 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
     Probij.at(mirrorIndex(i + 1, m), j) = PrCij(Cij, alpha, beta, mirrorIndex(i + 1, m), j);
     Probij.at(i, mirrorIndex(j - 1, n)) = PrCij(Cij, alpha, beta, i, mirrorIndex(j - 1, n));
     Probij.at(i, mirrorIndex(j + 1, n)) = PrCij(Cij, alpha, beta, i, mirrorIndex(j + 1, n));
-    
+
     N.at(k) = sum(dmvnorm(P.tube(i, j), Mu.col(k), Sigma.slice(k)));
     probK.at(k) = accu(Probij);
   }
-  //to do 
+  //to do
   //Normalization
   probK -= max(probK);
   probK = exp(probK);
@@ -75,7 +75,6 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
   return distSampling(rx);
   // return sum(Rcpp::RcppArmadillo::sample(fullvec, 1, true, probK));
 }
-
 
 // [[Rcpp::export]]
 void UpdateC_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta, mat Prob)

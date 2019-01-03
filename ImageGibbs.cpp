@@ -2,13 +2,15 @@
 #include <RcppArmadilloExtensions/sample.h>
 #include <mvnorm.h>
 #include <omp.h>
+#include <trng/discrete_dist.hpp>
+#include <trng/yarn2.hpp>
 #include <wishart.h>
 
-#include <UpdateC.cpp>
+#include <Potts.cpp>
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppArmadillo, RcppDist)]]
+// [[Rcpp::depends(RcppArmadillo)]]
 //User-defined reduction
 #pragma omp declare reduction(+                    \
                               : arma::mat          \
@@ -167,5 +169,3 @@ cube ImageGibbs(uword K, cube P, mat &C, mat &Mu, cube &Sigma, double alpha, dou
   return sampleC;
   // to do find Mod of sample C;
 }
-                                                  
-                              
