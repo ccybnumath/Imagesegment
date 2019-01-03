@@ -157,7 +157,7 @@ cube ImageGibbs(uword K, cube P, mat C, mat Mu, cube Sigma, double alpha, double
     //update Cij
     mat Prob(m, n, fill::zeros);
     InitProb_parallel(Prob, C, alpha, beta);
-    UpdateC_parallel(C, P, Mu, Sigma, m, n, K, alpha, beta);
+    UpdateC_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob);
 
     //record
     if (l >= burnIn)

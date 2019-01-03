@@ -10,84 +10,6 @@ using namespace std;
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppArmadillo, RcppDist)]]
 
-//Update Cij
-// to do parallel
-// [[Rcpp::export]]
-int UpdateCij(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
-              uword n, uword K, double alpha, double beta,
-              uword i, uword j)
-{
-  uword k;
-  vec probK(K, fill::zeros);
-  vec N(K, fill::zeros);
-  vec fullvec = regspace<vec>(0, K - 1);
-  mat Cij = C;
-  for (k = 0; k < K; k++)
-  {
-    Cij.at(i, j) = k;
-    N.at(k) = sum(dmvnorm(P.tube(i, j), Mu.col(k), Sigma.slice(k)));
-    probK.at(k) = Pr(Cij, alpha, beta);
-  }
-  probK -= max(probK);
-  probK = exp(probK);
-  probK /= max(probK);
-  //cout << probK << endl;
-  N /= max(N);
-  //cout << N << endl;
-  probK = probK % N / sum(probK.t() * N);
-  return sum(Rcpp::RcppArmadillo::sample(fullvec, 1, true, probK));
-}
-
-// [[Rcpp::export]]
-int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
-                       uword n, uword K, double alpha, double beta,
-                       uword i, uword j)
-{
-  uword k;
-  vec probK(K, fill::zeros);
-  vec N(K, fill::zeros);
-  vec fullvec = regspace<vec>(0, K - 1);
-  mat Cij = C;
-  for (k = 0; k < K; k++)
-  {
-    Cij.at(i, j) = k;
-    N.at(k) = sum(dmvnorm(P.tube(i, j), Mu.col(k), Sigma.slice(k)));
-    probK.at(k) = Pr_parallel(Cij, alpha, beta);
-  }
-  probK -= max(probK);
-  probK = exp(probK);
-  probK /= max(probK);
-  //cout << probK << endl;
-  N /= max(N);
-  //cout << N << endl;
-  probK = probK % N / sum(probK.t() * N);
-  return sum(Rcpp::RcppArmadillo::sample(fullvec, 1, true, probK));
-}
-
-// [[Rcpp::export]]
-void UpdateC(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta)
-{
-  uword i, j;
-  for (i = 0; i < m; i++)
-    for (j = 0; j < n; j++)
-    {
-      C.at(i, j) = UpdateCij(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j);
-    }
-}
-
-// [[Rcpp::export]]
-void UpdateC_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta)
-{
-  uword i, j;
-#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta) \
-    collapse(2)
-  for (i = 0; i < m; i++)
-    for (j = 0; j < n; j++)
-    {
-      C.at(i, j) = UpdateCij(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j);
-    }
-}
-
 // [[Rcpp::export]]
 void InitProb_parallel(mat &Prob, mat &C, double alpha, double beta)
 {
@@ -106,9 +28,9 @@ void InitProb_parallel(mat &Prob, mat &C, double alpha, double beta)
 }
 
 // [[Rcpp::export]]
-int UpdateCij_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
-                             uword n, uword K, double alpha, double beta,
-                             uword i, uword j, mat Prob)
+int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
+                       uword n, uword K, double alpha, double beta,
+                       uword i, uword j, mat Prob)
 {
   uword k;
   vec probK(K, fill::zeros);
@@ -129,7 +51,7 @@ int UpdateCij_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
     N.at(k) = sum(dmvnorm(P.tube(i, j), Mu.col(k), Sigma.slice(k)));
     probK.at(k) = accu(Probij);
   }
-
+  //to do 
   //Normalization
   probK -= max(probK);
   probK = exp(probK);
@@ -142,9 +64,33 @@ int UpdateCij_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
 }
 
 // [[Rcpp::export]]
-void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta, mat Prob)
+void UpdateC_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uword n, uword K, double alpha, double beta, mat Prob)
 {
-  /*
+
+  uword i, j;
+#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
+    collapse(2)
+  for (i = 0; i < m; i++)
+  {
+    for (j = 0; j < n; j++)
+    {
+      if (i % 2 == j % 2)
+        C.at(i, j) = UpdateCij_parallel(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
+    }
+  }
+#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
+    collapse(2)
+  for (i = 0; i < m; i++)
+  {
+    for (j = 0; j < n; j++)
+    {
+      if ((i + 1) % 2 == j % 2)
+        C.at(i, j) = UpdateCij_parallel(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
+    }
+  }
+}
+
+/*
   * 我的电脑的结果
   * > microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
   *Unit: seconds
@@ -157,31 +103,3 @@ void UpdateC_parallelUnique(mat &C, cube &P, mat &Mu, cube &Sigma, uword m, uwor
   *                                                                     expr      min       lq     mean   median       uq      max neval
   *  UpdateC_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta,      Prob) 22.18771 22.18771 22.18771 22.18771 22.18771 22.18771     1
   */
-  uword i, j;
-#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
-    collapse(2)
-  for (i = 0; i < m; i++)
-  {
-    for (j = 0; j < n; j++)
-    {
-      if (i % 2 == j % 2)
-        C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
-    }
-  }
-#pragma omp parallel for schedule(static) private(i, j) shared(m, n, C, P, Mu, Sigma, K, alpha, beta, Prob) \
-    collapse(2)
-  for (i = 0; i < m; i++)
-  {
-    for (j = 0; j < n; j++)
-    {
-      if ((i + 1) % 2 == j % 2)
-        C.at(i, j) = UpdateCij_parallelUnique(C, P, Mu, Sigma, m, n, K, alpha, beta, i, j, Prob);
-    }
-  }
-}
-
-/*** R
-library(microbenchmark)
-microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19,Prob))
-microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
-*/
