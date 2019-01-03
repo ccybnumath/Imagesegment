@@ -6,7 +6,7 @@
 #include <trng/yarn2.hpp>
 #include <wishart.h>
 
-#include <Potts.cpp>
+#include <UpdateC.cpp>
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
