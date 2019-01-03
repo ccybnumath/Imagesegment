@@ -10,7 +10,7 @@
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo,RcppDist)]]
 
 // [[Rcpp::export]]
 void InitProb_parallel(mat &Prob, mat &C, double alpha, double beta)

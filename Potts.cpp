@@ -7,7 +7,7 @@
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo,RcppDist)]]
 
 //Potts Model
 inline int mirrorIndex(int fetchI, int length)
