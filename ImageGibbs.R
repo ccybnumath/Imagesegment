@@ -81,7 +81,6 @@ for (i in 1:m) {
 writeJPEG(P_seg, "./my1.jpg", 0.95)
 writeJPEG(P, "./my2.jpg", 0.95)
 
-
 # test speed
 library(microbenchmark)
 microbenchmark(computeSk_parallel(P, C, Mu, 10), computeSk(P, C, Mu, 10))
