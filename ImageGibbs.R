@@ -47,7 +47,7 @@ mu0 = c(1, 1, 1)
 lambda0 = diag(rep(1, 3))
 Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
-result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 100, 2000)
+result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 500, 6000)
 
 Mod <- function(x) {
   as.numeric(names(table(x)))[which.max(table(x))]
