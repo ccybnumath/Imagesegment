@@ -102,7 +102,7 @@ vec sumP(cube &P, mat &C, int k)
 }
 
 // [[Rcpp::export]]
-cube ImageGibbs(uword K, cube P, mat C, mat Mu, cube Sigma, double alpha, double beta,
+cube ImageGibbs(uword K, cube P, mat &C, mat &Mu, cube &Sigma, double alpha, double beta,
                 vec mu0, mat lambda0, int v0, mat sigma0, uword burnIn, uword mcmcN)
 {
   /*

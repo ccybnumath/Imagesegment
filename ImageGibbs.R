@@ -39,8 +39,8 @@ for (k in 1:K) {
 }
 
 # Initial values
-alpha = 1
-beta = 0.5
+alpha = 0.8
+beta = 0.2
 v0 = 7 # df of prior Inverse-Wishart
 sigma0 = diag(rep(1, 3))
 mu0 = c(1, 1, 1)
@@ -48,8 +48,8 @@ lambda0 = diag(rep(1, 3))
 Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
 
-result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 500, 6000)
-
+#result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 500, 6000)
+result = ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 10, 100)
 
 Mod <- function(x) {
   as.numeric(names(table(x)))[which.max(table(x))]
@@ -80,6 +80,8 @@ for (i in 1:m) {
 }
 writeJPEG(P_seg, "./my1.jpg", 0.95)
 writeJPEG(P, "./my2.jpg", 0.95)
+
+
 # test speed
 library(microbenchmark)
 microbenchmark(computeSk_parallel(P, C, Mu, 10), computeSk(P, C, Mu, 10))

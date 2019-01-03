@@ -3,8 +3,7 @@
 #include <mvnorm.h>
 #include <omp.h>
 #include <wishart.h>
-#include <trng/yarn2.hpp>
-#include <trng/discrete_dist.hpp>
+
 
 #include <Potts.cpp>
 using namespace arma;
@@ -42,12 +41,12 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
   mat Probij = Prob;
   
   //trng distSampling
-  trng::yarn2 rx;
-  double x;
-  rx.seed(10);
-  int size = omp_get_num_threads();     // get total number of processes
-  int rank = omp_get_thread_num();      // get rank of current process
-  rx.split(size, rank);               // choose sub-stream no. rank out of size streams
+  // trng::yarn2 rx;
+  // double x;
+  // rx.seed(10);
+  // int size = omp_get_num_threads();     // get total number of processes
+  // int rank = omp_get_thread_num();      // get rank of current process
+  // rx.split(size, rank);               // choose sub-stream no. rank out of size streams
   
   for (k = 0; k < K; k++)
   {
@@ -71,8 +70,9 @@ int UpdateCij_parallel(mat &C, cube &P, mat &Mu, cube &Sigma, uword m,
   //cout << N << endl;
   probK = probK % N / sum(probK.t() * N);
   //cout << probK << endl;
-  trng::discrete_dist distSampling(probK.begin(), probK.end());
-  return distSampling(rx);
+  //trng::discrete_dist distSampling(probK.begin(), probK.end());
+  //return distSampling(rx);
+  return sum(Rcpp::RcppArmadillo::sample(fullvec, 1, true, probK));
 }
 
 // [[Rcpp::export]]
