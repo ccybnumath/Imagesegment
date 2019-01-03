@@ -1,6 +1,5 @@
-#Rcpp::sourceCpp('~/Rstudio_ccy/Imagesegment/ImageGibbs.cpp')
-Rcpp::sourceCpp('~/Rstudio_ccy/Imagesegment/test.cpp')
-print()
+Sys.setenv("PKG_LIBS"="-ltrng4")
+Rcpp::sourceCpp('~/Rstudio_ccy/Imagesegment/ImageGibbs.cpp')
 library(jpeg)
 P = readJPEG("./seg.jpg")
 #P=P[1:150,1:150,]
@@ -50,6 +49,6 @@ mu0 = c(1, 1, 1)
 lambda0 = diag(rep(1, 3))
 Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
-library(microbenchmark)
-#microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
-save.image("~/Rstudio_ccy/script.RData")
+# library(microbenchmark)
+# microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
+save.image(paste("~/Rstudio_ccy/script",date(),".RData"))

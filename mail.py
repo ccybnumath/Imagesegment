@@ -20,7 +20,12 @@ def sendemail():
         server.sendmail('chency1997@126.com',['710969718@qq.com','cychenbnu@icloud.com','chency1997@126.com'],msg.as_string())
         server.quit()
         print "Succeed"
+        return True
     except:
         print "False"
+        return False
 
-sendemail()
+
+r=sendemail()
+while(not r):
+    r=sendemail()
