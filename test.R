@@ -51,4 +51,5 @@ Prob <- matrix(rep(0,m*n),nrow = m,ncol = n)
 
 # library(microbenchmark)
 # microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
+Result=ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 500,500)
 save.image(paste("~/Rstudio_ccy/script",date(),".RData"))
