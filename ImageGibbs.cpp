@@ -13,7 +13,7 @@ using namespace std;
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppArmadillo,RcppDist)]]
 
-//User-defined reduction
+// User-defined reduction
 #pragma omp declare reduction(+                    \
                               : arma::mat          \
                               : omp_out += omp_in) \
@@ -48,26 +48,6 @@ mat computeSk_parallel(cube &P, mat &C, mat &Mu, int k)
 }
 
 // [[Rcpp::export]]
-mat computeSk(cube &P, mat &C, mat &Mu, int k)
-{
-  mat Sk(3, 3, fill::zeros);
-  vec temp;
-  uword i, j;
-  for (i = 0; i < C.n_rows; i++)
-    for (j = 0; j < C.n_cols; j++)
-    {
-      if (C.at(i, j) == k)
-      {
-        temp = P.tube(i, j);
-        temp -= Mu.col(k);
-        Sk += temp * temp.t();
-      }
-    }
-
-  return Sk;
-}
-
-// [[Rcpp::export]]
 vec sumP_parallel(cube &P, mat &C, int k)
 {
   vec temp;
@@ -78,23 +58,6 @@ vec sumP_parallel(cube &P, mat &C, int k)
     collapse(2)
   for (i = 0; i < C.n_rows; i++)
     for (j = 0; j < C.n_cols; j++)
-    {
-      if (C.at(i, j) == k)
-      {
-        temp = P.tube(i, j);
-        sum1 += temp;
-      }
-    }
-  return sum1;
-}
-
-// [[Rcpp::export]]
-vec sumP(cube &P, mat &C, int k)
-{
-  vec temp;
-  vec sum1(3, fill::zeros);
-  for (unsigned i = 0; i < C.n_rows; i++)
-    for (unsigned j = 0; j < C.n_cols; j++)
     {
       if (C.at(i, j) == k)
       {
