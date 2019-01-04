@@ -2,8 +2,6 @@
 #include <RcppArmadilloExtensions/sample.h>
 #include <mvnorm.h>
 #include <omp.h>
-#include <trng/discrete_dist.hpp>
-#include <trng/yarn2.hpp>
 #include <wishart.h>
 
 
