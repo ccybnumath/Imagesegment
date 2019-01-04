@@ -1,10 +1,10 @@
 library(jpeg)
-#P = readJPEG("./seg.jpg")
-P = readJPEG("./seg_big.jpg")
+P = readJPEG("./seg.jpg")
+#P = readJPEG("./seg_big.jpg")
 #P=P[1:150,1:150,]
 P_seg = P
 
-K = 14 #number of clusters
+K = 12 #number of clusters
 R = P[, , 1]
 G = P[, , 2]
 B = P[, , 3]
@@ -94,5 +94,11 @@ microbenchmark(
 )
 library(microbenchmark)
 microbenchmark(UpdateCij(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19),UpdateCij_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,15,19,Prob))
-microbenchmark(UpdateC_parallelUnique(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
+microbenchmark(UpdateC_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
 microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
+
+#profile
+# Sys.setenv(CPUPROFILE_FREQUENCY = 1000)
+# start_profiler("/Users/heshiyuan/profile5.out")
+# ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1)
+# stop_profiler()
