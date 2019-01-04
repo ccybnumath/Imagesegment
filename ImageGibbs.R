@@ -68,14 +68,14 @@ findMod <- function(result) {
 }
 
 library(RColorBrewer)
-C <- findMod(result)
+C1 <- findMod(Result)
 library(RColorBrewer)
 color <- col2rgb(brewer.pal(12, "Paired"))
 
-C <- C+1
+C1 <- C1+1
 for (i in 1:m) {
   for (j in 1:n) {
-    k = C[i, j]
+    k = C1[i, j]
     k = min(k, 12)
     P_seg[i, j, ] = as.vector(color[, k])
   }
