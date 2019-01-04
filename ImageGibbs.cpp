@@ -7,10 +7,12 @@
 #include <wishart.h>
 
 #include <UpdateC.cpp>
+
 using namespace arma;
 using namespace std;
 // [[Rcpp::plugins(openmp)]]
 // [[Rcpp::depends(RcppArmadillo,RcppDist)]]
+
 //User-defined reduction
 #pragma omp declare reduction(+                    \
                               : arma::mat          \
