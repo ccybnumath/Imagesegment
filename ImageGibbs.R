@@ -1,5 +1,6 @@
 library(jpeg)
-P = readJPEG("./seg.jpg")
+#P = readJPEG("./seg.jpg")
+P = readJPEG("./seg_big.jpg")
 #P=P[1:150,1:150,]
 P_seg = P
 
