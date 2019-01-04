@@ -1,4 +1,5 @@
-Sys.setenv("PKG_LIBS"="-ltrng4")
+#Sys.setenv("PKG_LIBS"="-ltrng4")
+Sys.setenv("PKG_LIBS"="-ltrng4 -lprofiler")
 Rcpp::sourceCpp('~/Rstudio_ccy/Imagesegment/ImageGibbs.cpp')
 library(jpeg)
 P = readJPEG("./seg.jpg")

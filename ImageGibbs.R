@@ -98,7 +98,10 @@ microbenchmark(UpdateC_parallel(C,P,Mu,Sigma,m,n,K,alpha,beta,Prob),times = 1)
 microbenchmark(ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1),times = 1)
 
 #profile
-# Sys.setenv(CPUPROFILE_FREQUENCY = 1000)
-# start_profiler("/Users/heshiyuan/profile5.out")
-# ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1)
-# stop_profiler()
+Sys.setenv(CPUPROFILE_FREQUENCY = 1000)
+start_profiler("/home/chencanyi2018/Rstudio_ccy/profile.out")
+ImageGibbs(K, P, C, Mu, Sigma, alpha, beta, mu0, lambda0, v0, sigma0, 0,1)
+stop_profiler()
+
+pprof --text /home/chencanyi2018/Rstudio_ccy/profile.out
+pprof --svg /home/chencanyi2018/Rstudio_ccy/profile.out >
